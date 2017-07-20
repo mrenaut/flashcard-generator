@@ -32,6 +32,9 @@ var correct = 0;
 //counts number of incorrect guesses
 var incorrect = 0;
 
+//counts the cards up
+var i = 0;
+
 
 //functions ===================================================================
 // function that presents user with a menu
@@ -129,7 +132,7 @@ var makeBasic = function () {
 		//a function to push the cards into basicCards array
 		var addBasicCard = new Basic(answers.front, answers.back);
 		basicCards.push(addBasicCard);
-		basicCards.push(allCards);
+		
 
 		//if user selects make another, the makeBasic funtion starts over again
 		if (answers.makeAnother == true) {
@@ -138,6 +141,7 @@ var makeBasic = function () {
 		//if user does not want to make another card, user is returned to the main menu
 		if (answers.makeAnother == false) {
 			start();
+			console.log(basicCards);
 		}
 	})
 
@@ -172,10 +176,15 @@ var makeClozeDelete = function () {
 
 
 	]).then(function (answers) {
+		
+		if (answers.text.includes(answers.cloze) === false) {
+			console.log("error!");
+		} else {  
 
 		//a function to push the cards into basicCards array
 		var addClozeCard = new ClozeCard(answers.text, answers.cloze);
 		clozeCards.push(addClozeCard);
+		}
 
 
 		//if user selects make another, the makeBasic funtion starts over again
@@ -186,6 +195,8 @@ var makeClozeDelete = function () {
 		if (answers.makeAnother == false) {
 			start();
 		}
+		
+		
 	})
 
 
@@ -202,10 +213,7 @@ var runBasic = function () {
 	//console.log(basicCards[0].front);
 	//need for loop to run through all the cards
 
-//============================================================================================================================================================
-	//THIS IS WHERE I NEED HELP.  CAN'T GET THE FOR LOOP TO RUN THROUGH QUESTIONS. JUST SPITS THEM ALL OUT AT ONCE
-	//IF I TAKE OUT THE FOR LOOP AND CHANGE THE [i]s TO [0]s IT WORKS PERFECTLY FOR THE FIRST QUESTION IN THE ARRAY
-	for (var i = 0; i <= basicCards.length; i++) {
+//======================================================================================================================================================
 
 		//asks user question on flash card
 		inquirer.prompt([
@@ -213,6 +221,7 @@ var runBasic = function () {
 				type: "input",
 				name: "question",
 				message: basicCards[i].front,
+			
 		},
 
 	//after asking question on flash card, answer gets processed.
@@ -228,9 +237,17 @@ var runBasic = function () {
 			}
 			//displays answer for user
 			console.log("The answer is " + basicCards[i].back);
-		})
+			
+			if (i<basicCards.length) {
+				i++;	
+				runBasic();
+			}
+
+			
+			
+		});
 	//end of for loop	
-	};
+	//};
 
 
 //end of runBasic function
@@ -249,22 +266,30 @@ var runClozeDelete = function () {
 		{
 			type: "input",
 			name: "question",
-			message: clozeCards[0].partial,
+			message: clozeCards[i].partial,
 		},
 
 
 	]).then(function (answers) {
 
-		if (answers.question == clozeCards[0].cloze) {
+		if (answers.question == clozeCards[i].cloze) {
 			console.log("Correct!");
 			correct++;
 		} else {
 			console.log("Incorrect!");
 			incorrect++;
 		}
-		console.log(clozeCards[0].cloze);
+		console.log(clozeCards[i].cloze);
 		console.log("your answer was: " + answers.question);
-		console.log("The answer is " + clozeCards[0].cloze);
+		console.log("The answer is " + clozeCards[i].cloze);
+		
+		if (i<clozeCards.length) {
+			i++;	
+			runClozeDelete();
+		} else {
+			console.log("correct: " + correct);
+			console.log("incorrect: " + incorrect);
+		}
 
 	})
 }
